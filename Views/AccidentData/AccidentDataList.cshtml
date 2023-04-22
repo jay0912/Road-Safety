@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "Accident Data List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using System.Data;
+@model DataTable;
+
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-10">
+            <h3 ><strong>Accident Data List</strong></h3>
+        </div>
+    </div>
+</div>
+
+<form class="pull-right form-inline my-2 my-lg-0" style="width : 20%;">
+    <input class="form-control mr-sm-2" id="sample_1" type="search" placeholder="Search" aria-label="Search">
+    <i class="fas fa-search text-black"></i>
+</form>
+
+<table class="table table-responsive-sm table-hover text-center mt-4" id="sample_1">
+    <thead class="table-secondary">
+        <tr>
+            <th class="py-4">AID</th>
+            
+            <th class="py-4">AcccidentDate</th>
+            <th class="py-4">Cause</th>
+            <th class="py-4">Casualties</th>
+            <th class="py-4">WeatherInfo</th>
+            <th class="py-4">AccidentAddrress</th>
+            <th class="py-4">LatLng</th>
+            <th class="py-4">Action</th>
+            <th class="py-4">Edit</th>
+        </tr>
+
+    </thead>
+    <tbody id="sample_2">
+        @foreach (DataRow dr in Model.Rows)
+        {
+            <tr>
+                <td>@dr["AID"]</td>
+                <td>@Convert.ToDateTime(dr["AcccidentDate"]).ToString("dd-MM-yyyy HH:MM")</td>
+                <td>@dr["Cause"]</td>
+                <td>@dr["Casualties"]</td>
+                <td>@dr["WeatherInfo"]</td>
+                <td>@dr["AccidentAddrress"]</td>
+                <td>@dr["LatLng"]</td>
+                <td>
+                    <form method=" post" asp-controller="AccidentData" asp-action="Delete">
+                        <input type="hidden" name="AID" value=" @Convert.ToInt32(dr["AID"].ToString()) " />
+                        <button type="submit" class=" btn btn-danger" onclick="return fun1()">DELETE</button>
+                    </form>
+                </td>
+
+                <td>
+                    <a asp-controller="AccidentData" asp-action="Add" class="btn btn-primary" asp-route-AID="@Convert.ToInt32(dr["AID"].ToString())">Update</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+            $("#sample_1").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $("#sample_2 tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+
+        $(document).ready(function() {
+            $('#sample_1').DataTable({
+        dom: 'Plfrtip',
+        language: {
+            searchPanes: {
+                emptyPanes: 'There are no panes to display. :/'
+            }
+        }
+    });
+});
+
+        function fun1() {
+            if (confirm("Are You Sure You Want To Delete?")) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+    </script>
+}

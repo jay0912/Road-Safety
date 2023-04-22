@@ -1,0 +1,228 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@using System.Data;
+@model DataTable;
+@{
+    Int32 abc = Model.Rows.Count;
+    
+}
+<table>
+    <tr>
+        <td>
+            <div class="weather-widget">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div style="min-width:300px;aspect-ratio:9/16">
+
+                        <div class="card" style="color: #4B515D; border-radius: 35px;">
+                            <div class="card-body p-4">
+
+                                <div class="d-flex">
+                                    <h6 class="flex-grow-1"id="city"></h6>
+                                    <h6 id="time"></h6>
+                                </div>
+
+                                <div class="d-flex flex-column text-center mt-5 mb-4">
+                                    <h6 class="display-4 mb-0 font-weight-bold" style="color: #1C2331; "id="temp"></h6>
+                                    <span class="small" style="color: #868B94" id="weather"></span>
+                                </div>
+
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-grow-1" style="font-size: 1rem;">
+                                        <div>
+                                            <i class="fas fa-wind fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="speed">
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-tint fa-fw" style="color: #868B94;"></i> <span class="ms-1" id="humidity">  </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-weather/ilu1.webp"
+                                             width=100>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </td>
+
+        <script>
+            var data;
+            function showWeather(a, b) {
+                let response = fetch("https://api.openweathermap.org/data/2.5/weather?lat=" + a + "&lon=" + b + "&appid=f5af25650e66ecb00e4f0798ef27ecbb").then(response => response.text()).then(data => {
+                    console.log(data);
+                    this.data = JSON.parse(data);
+                    let t = new Date().getHours() + ":" + new Date().getMinutes();
+                    console.log(this.data);
+                    document.getElementById("city").innerHTML = this.data.name;
+                    document.getElementById("weather").innerHTML = this.data.weather[0].main;
+                    document.getElementById("temp").innerHTML = Math.trunc(parseInt(this.data.main.temp) - 273.15)+" C";
+                    document.getElementById("speed").innerHTML = this.data.wind.speed+"Km/h";
+                    document.getElementById("humidity").innerHTML = "humidity "+this.data.main.humidity;
+                    document.getElementById("time").innerHTML = t;
+                });
+            }
+        </script>
+        <td>
+            <div style="width: 80vw; aspect-ratio:16/7;" id="mapContainer"></div>
+            <script>
+                var arr = [];
+            </script>
+            @foreach (DataRow dt in Model.Rows)
+            {
+                string[] str = @dt["LatLng"].ToString()!.Split(",");
+                <script>
+                    a = {
+                        latLng: {
+                            lat: @str[0],
+                            lng: @str[1]
+                                    },
+                        AcccidentDate: new Date("@dt["AcccidentDate"]"),
+                        Cause: "@dt["Cause"]",
+                        Casualties: "@dt["Casualties"]",
+                        WeatherInfo: "@dt["WeatherInfo"]",
+                        AccidentAddrress: "@dt["AccidentAddrress"]"
+                    };
+                    arr.push(a);
+                </script>
+            }
+            <script>
+                console.log(arr);
+                var a;
+                var b;
+                var ui;
+                var platform = new H.service.Platform({
+                    'apikey': 'UKWgzJxvEE7b1lDSnyNapu94xL4Wt5AfSksdGb25qY4'
+                });
+                // Obtain the default map types from the platform object:
+                var defaultLayers = platform.createDefaultLayers();
+
+                // Instantiate (and display) a map object:
+                const options = {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0,
+                };
+
+                function addMarkerToGroup(group, coordinate, html) {
+                    var picon2 = new H.map.Icon("https://cdn1.iconfinder.com/data/icons/ui-navigation-1/152/alert-512.png", { size: { w: 25, h: 30 } });
+                    var marker = new H.map.Marker(coordinate, { icon: picon2 });
+                    // add custom data to the marker
+                    marker.setData(html);
+                    group.addObject(marker);
+                }
+                function addInfoBubble(map) {
+                    var group = new H.map.Group();
+
+                    map.addObject(group);
+
+                    // add 'tap' event listener, that opens info bubble, to the group
+                    group.addEventListener('tap', function (evt) {
+                        // event target is the marker itself, group is a parent event target
+                        // for all objects that it contains
+                        var bubble = new H.ui.InfoBubble(evt.target.getGeometry(), {
+                            // read custom data
+                            content: evt.target.getData()
+                        });
+                        // show info bubble
+                        ui.addBubble(bubble);
+                    }, true);
+                    arr.forEach((e) => {
+                        console.log(e);
+                        //var marker = new H.map.Marker(e, { icon: picon2 });
+                        addMarkerToGroup(
+                            group,
+                            e["latLng"],
+                            "<div><table class='table'" +
+                            "<tr>" +
+                            "<td>Address  </td>" +
+                            "<td>" + e["AccidentAddrress"] + "</td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td>Cause  </td>" +
+                            "<td>" + e["Cause"] + "</td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td>Casualties  </td>" +
+                            "<td>" + e["Casualties"] + "</td>" +
+                            "</tr>" +
+                            "<tr>" +
+                            "<td>Date of Accident</td>" +
+                            "<td>" + new Date(e["AcccidentDate"]).getDate() + "/" + (parseInt(new Date(e["AcccidentDate"]).getMonth()) + 1) + "/" + new Date(e["AcccidentDate"]).getFullYear() + "</td>" +
+                            "</tr>" +
+                            "</table>" +
+                            "</div>"
+                        );
+                        //map.addObject(marker);
+                    });
+
+                }
+
+
+                function showSOS() {
+                    document.getElementById("displaytable").style.display = "block";
+                }
+
+                function success(pos) {
+                    const crd = pos.coords;
+                    a = crd.latitude;
+                    b = crd.longitude;
+                    var map = new H.Map(
+                        document.getElementById('mapContainer'),
+                        defaultLayers.vector.normal.map,
+                        {
+                            zoom: 13,
+                            center: { lat: a, lng: b },
+                            devicePixelRatio: window.devicePixelRatio
+                        });
+                    window.addEventListener('resize', () => map.getViewPort().resize());
+
+                    var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+                    ui = H.ui.UI.createDefault(map, defaultLayers);
+                    var CurrentLocationMarker = new H.map.Marker({ lat: a, lng: b });
+
+                    addInfoBubble(map);
+                    showWeather(a, b);
+
+                    // Create a marker icon from an image URL:
+                    var picon2 = new H.map.Icon("https://cdn1.iconfinder.com/data/icons/ui-navigation-1/152/alert-512.png", { size: { w: 25, h: 30 } });
+                    // Create a marker icon from an image URL:
+                    var picon1 = new H.map.Icon("https://cdn1.iconfinder.com/data/icons/twitter-ui-colored/48/JD-22-512.png", { size: { w: 45, h: 50 } });
+                    //current location marker
+                    var parisMarker = new H.map.Marker({ lat: a, lng: b }, { icon: picon1 });
+
+
+                    map.addObject(parisMarker);
+
+                    //var LocationOfMarker = { lat: 26.9124, lng: 75.7873 };
+
+                    // Create a marker using the previously instantiated icon:
+                    //var marker = new H.map.Marker(LocationOfMarker, { icon: picon2 });
+
+                    // Add the marker to the map:
+                    //map.addObject(marker);
+                    //map.setCenter(marker);
+                }
+
+                function error(err) {
+                    console.warn(`ERROR(${err.code}): ${err.message}`);
+                }
+
+                navigator.geolocation.getCurrentPosition(success, error, options);
+
+
+
+            </script>
+
+        </td>
+    </tr>
+</table>
+   

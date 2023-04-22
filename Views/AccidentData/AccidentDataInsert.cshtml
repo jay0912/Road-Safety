@@ -1,0 +1,254 @@
+﻿@{
+    ViewData["Title"] = "Add Accident";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model AccidentData
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <section class="get-in-touch">
+
+        <h1 class="title">ADD DATA</h1>
+        <h5 class="text-uppercase text-center mb-5" style="background: linear-gradient(to bottom, #ff99ff 0%, #9966ff 100%)">@TempData["Msg"]</h5>
+
+        <form class="contact-form row" method="post" asp-controller="AccidentData" asp-action="insert">
+
+            @Html.HiddenFor(x=>x.AID)
+
+
+
+          <div class="form-field col-lg-6">
+                <input id="name" class="input-text js-input" type="date" asp-for="AcccidentDate"   required/>
+                <label class="mb-4 label" for="name">Acccident Date</label>
+          </div>
+
+          <div class="form-field col-lg-6 ">
+                <input id="email" class="input-text js-input" type="text" asp-for="Cause"  required/>
+                <label class="mb-4  label">Cause</label>
+          </div>
+          <div class="form-field col-lg-6 ">
+                <input id="company" class="input-text js-input" type="text" asp-for="Casualties" required/>
+                <label class="mb-4  label">Casualties</label>
+          </div>
+           <div class="form-field col-lg-6 ">
+                <input id="phone" class="input-text js-input" type="text" asp-for="WeatherInfo"  required/>
+                <label class="mb-4  label">WeatherInfo</label>
+            </div>
+
+            <div class="form-field col-lg-12">
+                <input id="message" class="input-text js-input" type="text" asp-for="AccidentAddrress" required/>
+                <label class="mb-4  label">AccidentAddrress</label>
+            </div>
+
+            <div class="form-field col-lg-12">
+                <input id="message5" class="input-text js-input" type="text" asp-for="LatLng" required/>
+                <label class="mb-4  label">LatLng</label>
+            </div>
+
+            <div style="width: 100%; height: 480px" id="mapContainer"></div>
+            <script>
+                function setUpClickListener(map) {
+                    // Attach an event listener to map display
+                    // obtain the coordinates and display in an alert box.
+                    map.addEventListener('tap', function (evt) {
+                        var coord = map.screenToGeo(evt.currentPointer.viewportX,
+                            evt.currentPointer.viewportY);
+                        document.getElementById("message5").value=coord.lat+','+coord.lng;
+
+                    });
+                }
+
+
+
+                /**
+                 * Boilerplate map initialization code starts below:
+                 */
+
+                //Step 1: initialize communication with the platform
+                // In your own code, replace variable window.apikey with your own apikey
+                var platform = new H.service.Platform({
+                    'apikey': 'UKWgzJxvEE7b1lDSnyNapu94xL4Wt5AfSksdGb25qY4'
+                });
+                var defaultLayers = platform.createDefaultLayers();
+
+                //Step 2: initialize a map
+                var map = new H.Map(document.getElementById('mapContainer'),
+                    defaultLayers.vector.normal.map, {
+                    center: { lat: 30.94625288456589, lng: -54.10861860580418 },
+                    zoom: 1,
+                    pixelRatio: window.devicePixelRatio || 1
+                });
+                // add a resize listener to make sure that the map occupies the whole container
+                window.addEventListener('resize', () => map.getViewPort().resize());
+
+                //Step 3: make the map interactive
+                // MapEvents enables the event system
+                // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
+                var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+                // Step 4: create custom logging facilities
+                var logContainer = document.createElement('ul');
+                logContainer.className = 'log';
+                logContainer.innerHTML = '<li class="log-entry">Try clicking on the map</li>';
+                map.getElement().appendChild(logContainer);
+
+                // Helper for logging events
+                function logEvent(str) {
+                    var entry = document.createElement('li');
+                    entry.className = 'log-entry';
+                    entry.textContent = str;
+                    logContainer.insertBefore(entry, logContainer.firstChild);
+                }
+
+
+                setUpClickListener(map);
+            </script>
+
+           
+
+            <div class="d-flex ">
+                <div class="form-field ">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+                <div class="form-field  mx-3">
+                    <a asp-controller="AccidentData" asp-action="Index" class="btn btn-danger">Cancel</a>
+                </div>
+            </div>
+
+
+        </form>
+
+
+    </section>
+
+</body>
+</html>
+
+
+
+@*
+    <div class="mask d-flex align-items-center h-150 gradient-custom-3">
+        <div class="container h-150">
+            <div class="row d-flex justify-content-center align-items-center h-150">
+                <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                    <div class="card" style="border-radius: 15px;">
+                        <div class="card-body p-5">
+                            <h2 class="text-uppercase text-center mb-5">ADD DATA</h2>
+                            <h5 class="text-uppercase text-center mb-5" style="background: linear-gradient(to bottom, #ff99ff 0%, #9966ff 100%)">@TempData["Msg"]</h5>
+
+                            <form method="post" asp-controller="AccidentData" asp-action="insert">
+                                @Html.HiddenFor(x=>x.AID)
+
+
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="form3Example1cg"><strong>Acccident Date</strong></label>
+                                    <input type="date" asp-for="AcccidentDate" class="form-control form-control-lg" />
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="form3Example2cg"><strong>Cause</strong></label>
+                                    <input type="text" asp-for="Cause" class="form-control form-control-lg" />
+                                    
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="form3Example3cg"><strong>Casualties</strong></label>
+                                    <input type="text" asp-for="Casualties" class="form-control form-control-lg" />
+
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="form3Example4cg"><strong>WeatherInfo</strong></label>
+                                    <input type="text" asp-for="WeatherInfo" class="form-control form-control-lg" />
+
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="form3Example5cg"><strong>AccidentAddrress</strong></label>
+                                    <input type="text" asp-for="AccidentAddrress" class="form-control form-control-lg" />
+
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <label class="form-label" for="form3Example5cg"><strong>LatLng</strong></label>
+                                    <input type="text" asp-for="LatLng" class="form-control form-control-lg" />
+                                    <div id="map" style="width:450px; height:450px"></div>
+                                    <script>
+                                        var platform = new H.service.Platform({
+                                            'apikey': 'UKWgzJxvEE7b1lDSnyNapu94xL4Wt5AfSksdGb25qY4'
+                                        });
+                                        var defaultLayers = platform.createDefaultLayers();
+
+                                        function error(err) {
+                                            console.warn(`ERROR(${err.code}): ${err.message}`);
+                                        }
+                                        const options = {
+                                            enableHighAccuracy: true,
+                                            timeout: 5000,
+                                            maximumAge: 0,
+                                        };
+                                        var map;
+                                        function success(pos) {
+                                            const crd = pos.coords;
+                                            a = crd.latitude;
+                                            b = crd.longitude;
+                                            map = new H.Map(
+                                                document.getElementById('map'),
+                                                defaultLayers.vector.normal.map,
+                                                {
+                                                    zoom: 13,
+                                                    center: { lat: a, lng: b },
+                                                    devicePixelRatio: window.devicePixelRatio
+                                                }
+                                            );
+                                            window.addEventListener('resize', () => map.getViewPort().resize());
+
+                                            ui = H.ui.UI.createDefault(map, defaultLayers);
+                                            var CurrentLocationMarker = new H.map.Marker({ lat: a, lng: b });
+
+                                            var picon1 = new H.map.Icon("https://cdn1.iconfinder.com/data/icons/twitter-ui-colored/48/JD-22-512.png", { size: { w: 45, h: 50 } });
+                                            var parisMarker = new H.map.Marker({ lat: a, lng: b }, { icon: picon1 });
+                                        }
+                                        
+                                        navigator.geolocation.getCurrentPosition(success, error, options);
+
+                                        var mapEvents = new H.mapevents.MapEvents(map);
+
+                                        map.addEventListener('tap', function (evt) {
+                                            var coord = map.screenToGeo(evt.currentPointer.viewportX,
+                                                evt.currentPointer.viewportY);
+                                            logEvent('Clicked at ' + Math.abs(coord.lat.toFixed(4)) +
+                                                ((coord.lat > 0) ? 'N' : 'S') +
+                                                ' ' + Math.abs(coord.lng.toFixed(4)) +
+                                                ((coord.lng > 0) ? 'E' : 'W'));
+                                        });
+                                        var behavior = new H.mapevents.Behavior(mapEvents);
+                                    </script>
+
+                                </div>
+
+                                <div class="d-flex ">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+                                    <div class="mx-3">
+                                        <a asp-controller="AccidentData" asp-action="Index" class="btn btn-danger">Cancel</a>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+*@
